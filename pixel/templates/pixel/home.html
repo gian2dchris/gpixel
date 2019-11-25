@@ -1,0 +1,35 @@
+{% extends "pixel/includes/header.html" %}
+	{% block content%}
+		<div class="container">
+		{% if user.is_authenticated %}
+		<h1>Greetings {{user.username}}</h1>
+		<div class="data">
+		 	<table class="table table-striped table-bordered">
+				<tr>
+					<th>Time Opened</th>
+					<th>IP</th>
+					<th>Country</th>
+					<th>Country Code</th>
+					<th>Region</th>
+					<th>Device</th>
+					<th>OS</th>
+					<th>Agent</th>
+				</tr>
+			{% for v in page_visits%}
+				<tr>
+					<td>{{ v.time_opened }}</td>
+					<td>{{ v.ip }}</td>
+					<td>{{ v.country_name }}</td>
+					<td>{{ v.country_code }}</td>
+					<td>{{ v.region_name }}</td>
+					<td>{{ v.device }}</td>
+					<td>{{ v.agent }}</td>			
+					<td>{{ v.os }}</td>
+				</tr>
+			{% endfor %}
+		</table>
+		</div>
+		{% else %}
+			<h1>Greetings</h1>
+		{% endif %}
+	{% endblock%}
