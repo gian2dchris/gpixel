@@ -5,17 +5,21 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.utils import timezone
 
-from .forms import NewUserForm
-from .models import PageVisit
+from .forms import NewUserForm,RegisterDomainForm,DeleteDomainForm,ChangePasswordForm
+from .models import PageVisit, Domain
+from django.contrib.auth.models import User
+
 
 import requests
 import json
+import uuid
 from ua_parser import user_agent_parser
 
 
 def homepage(request):
 
 	if request.user.is_authenticated:
+#		user = User.objects.get(id=request.session['_auth_user_id'])
 		page_visits = PageVisit.objects.all().values().order_by("-time_opened")
 
 		return render(request=request,
@@ -54,30 +58,50 @@ def pixel(request):
 		agent = user_agent_parser.ParseUserAgent(ua_string)['family']
 		device = user_agent_parser.ParseDevice(ua_string)['family']
 	
-	'''
-	if 'HTTP_REFERER' in request.META:
-		print('HTTP_REFERER: ' + request.META['HTTP_REFERER'])
-	
-	if 'HTTP_HOST' in request.META:
-		print('HTTP_HOST: ' + request.META['HTTP_HOST'])
-
-	if 'REMOTE_HOST' in request.META:
-		print('REMOTE_HOST: ' + request.META['REMOTE_HOST'])
-
-	if 'REMOTE_ADDR' in request.META:
-		print('REMOTE_ADDR: ' + request.META['REMOTE_ADDR'])
-
-	if 'REMOTE_USER' in request.META:
-		print('REMOTE_USER: ' + request.META['REMOTE_USER'])
-
-	if 'SERVER_NAME' in  request.META:
-		print('SERVER_NAME: ' + request.META['SERVER_NAME'])
-	'''
-	
 	visit = PageVisit(ip=ip, agent=agent, os=os, device=device, country_name=country_name, country_code=country_code, region_name=region_name, time_opened=timezone.now())
 	visit.save()
-
 	return(HttpResponse('pixel'))
+
+
+def settings(request):
+
+	#POST
+	if request.method == "POST":
+		register_domain_form = RegisterDomainForm(request.POST,request.user)
+		delete_domain_form = DeleteDomainForm(request.POST)
+		change_password_form = ChangePasswordForm(request.POST)
+
+		if register_domain_form.is_valid():
+			
+			user = User.objects.get(id=request.session['_auth_user_id'])
+			domain_name = register_domain_form.cleaned_data.get("domain_name")
+			tracking_slug = uuid
+			domain = Domain(user=user,domain_name=domain_name)
+			domain.save()
+			return HttpResponse("OK")
+		elif delete_domain_form.is_valid():
+			return HttpResponse("OK")
+		
+		elif change_password_form.is_valid():
+			print("change pwd")
+			user = change_password_form.save()
+			update_session_auth_hash(request, user)  # Important!
+			return redirect("homepage")
+		else:
+			return HttpResponse("Not OK.")
+
+	#GET
+	else:
+		register_domain_form = RegisterDomainForm()
+		delete_domain_form = DeleteDomainForm()
+		change_password_form = ChangePasswordForm(request.user)
+
+		return render(request=request,
+			template_name="pixel/settings.html",
+			context = {"new_domain_form":register_domain_form,
+			"delete_domain_form":delete_domain_form,
+			"change_password_form":change_password_form})
+	
 
 def register(request):
 	
