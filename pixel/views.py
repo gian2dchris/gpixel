@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login, logout, authenticate
-from django.contrib import messages
+from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.utils import timezone
+from django.contrib import messages
 
 from .forms import NewUserForm,RegisterDomainForm,DeleteDomainForm,ChangePasswordForm
 from .models import PageVisit, Domain
@@ -12,19 +12,19 @@ from django.contrib.auth.models import User
 
 import requests
 import json
-import uuid
 from ua_parser import user_agent_parser
 
 
 def homepage(request):
 
 	if request.user.is_authenticated:
-#		user = User.objects.get(id=request.session['_auth_user_id'])
+		user = User.objects.get(id=request.session['_auth_user_id'])
 		page_visits = PageVisit.objects.all().values().order_by("-time_opened")
+		domains = Domain.objects.filter(user=user)
 
 		return render(request=request,
 			template_name="pixel/home.html",
-			context={"page_visits": page_visits})
+			context={"page_visits": page_visits, "domains":domains})
 	
 	else:
 		return render(request=request,
@@ -65,43 +65,58 @@ def pixel(request):
 
 def settings(request):
 
-	#POST
-	if request.method == "POST":
-		register_domain_form = RegisterDomainForm(request.POST,request.user)
-		delete_domain_form = DeleteDomainForm(request.POST)
-		change_password_form = ChangePasswordForm(request.POST)
+	if request.user.is_authenticated:
+		#POST
+		if request.method == "POST":
+			register_domain_form = RegisterDomainForm(request.POST)
+			delete_domain_form = DeleteDomainForm(request.POST)
+			change_password_form = ChangePasswordForm(data=request.POST,user=request.user)
 
-		if register_domain_form.is_valid():
-			
-			user = User.objects.get(id=request.session['_auth_user_id'])
-			domain_name = register_domain_form.cleaned_data.get("domain_name")
-			tracking_slug = uuid
-			domain = Domain(user=user,domain_name=domain_name)
-			domain.save()
-			return HttpResponse("OK")
-		elif delete_domain_form.is_valid():
-			return HttpResponse("OK")
-		
-		elif change_password_form.is_valid():
-			print("change pwd")
-			user = change_password_form.save()
-			update_session_auth_hash(request, user)  # Important!
-			return redirect("homepage")
+			if register_domain_form.is_valid():
+				print("Register Domain.")
+				user = User.objects.get(id=request.session['_auth_user_id'])
+				domain_name = register_domain_form.cleaned_data.get("reg_domain_name")
+				domain = Domain(user=user,domain_name=domain_name)
+				domain.save()
+
+			elif delete_domain_form.is_valid():
+				print("Delete Domain")
+				domain_name = delete_domain_form.cleaned_data.get("del_domain_name")
+				Domain.objects.filter(domain_name=domain_name).delete()
+				
+			elif change_password_form.is_valid():
+				print("change pwd")
+				user = change_password_form.save()
+				update_session_auth_hash(request, user)  # Important!
+				return redirect("homepage")
+			else:
+				return HttpResponse("Not OK.")
+
+
+			register_domain_form = RegisterDomainForm()
+			delete_domain_form = DeleteDomainForm()
+			change_password_form = ChangePasswordForm(user=request.user)
+
+			return render(request=request,
+				template_name="pixel/settings.html",
+				context = {"register_domain_form":register_domain_form,
+				"delete_domain_form":delete_domain_form,
+				"change_password_form":change_password_form})
+
+		#GET
 		else:
-			return HttpResponse("Not OK.")
+			register_domain_form = RegisterDomainForm()
+			delete_domain_form = DeleteDomainForm()
+			change_password_form = ChangePasswordForm(user=request.user)
 
-	#GET
+			return render(request=request,
+				template_name="pixel/settings.html",
+				context = {"register_domain_form":register_domain_form,
+				"delete_domain_form":delete_domain_form,
+				"change_password_form":change_password_form})
 	else:
-		register_domain_form = RegisterDomainForm()
-		delete_domain_form = DeleteDomainForm()
-		change_password_form = ChangePasswordForm(request.user)
+		return redirect("homepage")
 
-		return render(request=request,
-			template_name="pixel/settings.html",
-			context = {"new_domain_form":register_domain_form,
-			"delete_domain_form":delete_domain_form,
-			"change_password_form":change_password_form})
-	
 
 def register(request):
 	
