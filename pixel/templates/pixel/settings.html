@@ -1,0 +1,22 @@
+{% extends "pixel/base.html" %}
+
+	{% block content%}
+		<form method="POST">
+ 			{% csrf_token %}
+ 			{{register_domain_form.as_p}}
+ 			<button class="btn" type="submit"  style="background-color: limegreen";> Register </button>
+		</form>
+
+		<form method="POST">
+ 			{% csrf_token %}
+ 			{{delete_domain_form.as_p}}
+ 			<button class="btn" type="submit"  style="background-color: limegreen";> Delete </button>
+		</form>
+		<form method="POST">
+ 			{% csrf_token %}
+ 			{{change_password_form.as_p}}
+ 			<button class="btn" type="submit"  style="background-color: limegreen";> Confirm </button>
+		</form>
+
+		If you already have an account, <a href="/login"><strong>login</strongs></a> instead.
+	{% endblock%}

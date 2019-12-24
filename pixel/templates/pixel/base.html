@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Home</title>
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="/static/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="/static/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/><style>
+    table, th, td {
+     border: 2px solid black;
+     color: white;
+
+    }
+    th {
+      background-color: limegreen;
+    }
+    </style>
+    <nav>
+      <div class="nav-wrapper" style="background-color: limegreen;">
+        <a href="/" class="brand-logo">PixelTracker</a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+          <li><a href="/"> Home</a></li>
+          {% if user.is_authenticated %}
+            <li><a href="/settings">Settings</a></li>
+            <li><a href="/logout">Logout</a></li>
+          {% else %}
+            <li><a href="/register">Register</a></li>
+            <li><a href="/login">Login</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+
+  </head>
+
+  <body style="color: white; background-color: darkslategrey;">
+    {% include "pixel/messages.html" %}
+    <div class="container">
+      <br></br>
+      {% block content %}
+      {% endblock %}
+    </div>
+
+
+  </body>
+
+  <!--  Scripts-->  
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="{% static 'js/materialize.js' %}"></script>
+  <script src="{% static 'js/init.js' %}"></script>
+</html>
