@@ -22,7 +22,7 @@ def homepage(request):
 		user = User.objects.get(id=request.session['_auth_user_id'])
 		domains = [(d.id, d.domain_name) for d in Domain.objects.filter(user=user)]
 		domains = sorted(domains)
-		
+
 		if request.method == "POST":
 			select_domain_form = SelectDomainForm(data=request.POST, domains=domains)
 			if select_domain_form.is_valid():
@@ -91,14 +91,16 @@ def settings(request):
 			change_password_form = ChangePasswordForm(data=request.POST,user=request.user)
 
 			if register_domain_form.is_valid():
-				domain_name = register_domain_form.cleaned_data.get("reg_domain_name")
+				domain_name = register_domain_form.cleaned_data.get("domain_name")
 				domain = Domain(user=user,domain_name=domain_name)
 				domain.save()
-
+				domains = [(d.id, d.domain_name) for d in Domain.objects.filter(user=user)]
+		
 			elif delete_domain_form.is_valid():
-				domain_name = delete_domain_form.cleaned_data.get("del_domain_name")
-				Domain.objects.filter(domain_name=domain_name).delete()
-				
+				domain_id = delete_domain_form.cleaned_data.get("domain")
+				Domain.objects.filter(id=domain_id).delete()
+				domains = [(d.id, d.domain_name) for d in Domain.objects.filter(user=user)]
+		
 			elif change_password_form.is_valid():
 				user = change_password_form.save()
 				update_session_auth_hash(request, user)  # Important!
