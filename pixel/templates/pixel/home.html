@@ -1,6 +1,7 @@
 {% extends "pixel/base.html" %}
 	{% block content%}	
 		<div class="container">
+			<a>Referring Page: {{ request.META.HTTP_REFERER }}</a>
 			{% if user.is_authenticated %}
 			<h1>Greetings {{user.username}}</h1>
 

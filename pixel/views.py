@@ -9,7 +9,6 @@ from .forms import NewUserForm,RegisterDomainForm,SelectDomainForm,ChangePasswor
 from .models import PageVisit, Domain
 from django.contrib.auth.models import User
 
-
 import requests
 import json
 import uuid
@@ -42,7 +41,8 @@ def homepage(request):
 	else:
 		return render(request=request,
 				template_name="pixel/home.html",)
-		
+
+	
 def pixel(request, tracking_slug):
 	
 	tracking_slug = uuid.UUID(tracking_slug)
@@ -74,6 +74,9 @@ def pixel(request, tracking_slug):
 			agent = user_agent_parser.ParseUserAgent(ua_string)['family']
 			device = user_agent_parser.ParseDevice(ua_string)['family']
 		
+		if 'HTTP_REFERER' in request.META.keys():
+			print(request.META['HTTP_REFERER'])
+
 		visit = PageVisit(domain=domain, ip=ip, agent=agent, os=os, device=device, country_name=country_name, country_code=country_code, region_name=region_name, time_opened=timezone.now())
 		visit.save()
 		return(HttpResponse('pixel'))
