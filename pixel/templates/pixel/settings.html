@@ -9,7 +9,15 @@
 
 		<form method="POST">
  			{% csrf_token %}
- 			{{delete_domain_form.as_p}}
+			{{ delete_domain_form.domain.label_tag }}
+ 			{{ delete_domain_form.domain}}
+			<div class="input-field">
+				<select name="{{ delete_domain_form.domain.name }}" class="browser-default">
+            	{% for d in delete_domain_form.fields.domain.choices %}
+              		<option value="{{d.0}}">{{d.1}}</option>
+        		{% endfor %}
+	      		</select>
+          	</div>
  			<button class="btn" type="submit"  style="background-color: limegreen";> Delete </button>
 		</form>
 		<form method="POST">

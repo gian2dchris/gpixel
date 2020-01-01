@@ -5,13 +5,14 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.utils import timezone
 from django.contrib import messages
 
-from .forms import NewUserForm,RegisterDomainForm,DeleteDomainForm,ChangePasswordForm
+from .forms import NewUserForm,RegisterDomainForm,SelectDomainForm,ChangePasswordForm
 from .models import PageVisit, Domain
 from django.contrib.auth.models import User
 
 
 import requests
 import json
+import uuid
 from ua_parser import user_agent_parser
 
 
@@ -19,73 +20,86 @@ def homepage(request):
 
 	if request.user.is_authenticated:
 		user = User.objects.get(id=request.session['_auth_user_id'])
-		page_visits = PageVisit.objects.all().values().order_by("-time_opened")
-		domains = Domain.objects.filter(user=user)
+		domains = [(d.id, d.domain_name) for d in Domain.objects.filter(user=user)]
+		domains = sorted(domains)
+		
+		if request.method == "POST":
+			select_domain_form = SelectDomainForm(data=request.POST, domains=domains)
+			if select_domain_form.is_valid():
+				domain = select_domain_form.cleaned_data.get('domain')
+				page_visits = PageVisit.objects.filter(domain=domain).values().order_by("-time_opened")
+				return render(request=request,
+					template_name="pixel/home.html",
+					context={"page_visits": page_visits, "domains":domains,"select_domain_form":select_domain_form})
 
-		return render(request=request,
-			template_name="pixel/home.html",
-			context={"page_visits": page_visits, "domains":domains})
+		else:
+			select_domain_form = SelectDomainForm(domains=domains)
+			page_visits = PageVisit.objects.filter(domain=domains[0]).values().order_by("-time_opened")
+			return render(request=request,
+				template_name="pixel/home.html",
+				context={"page_visits": page_visits, "domains":domains,"select_domain_form":select_domain_form})
 	
 	else:
 		return render(request=request,
 				template_name="pixel/home.html",)
 		
-def pixel(request):
+def pixel(request, tracking_slug):
 	
-	#https://freegeoip.io/
-	if 'HTTP_X_FORWARDED_FOR' in request.META.keys() and request.META['HTTP_X_FORWARDED_FOR'] is not None:
-		ip = str(request.META['HTTP_X_FORWARDED_FOR'])
-	elif 'REMOTE_ADDR' in request.META.keys():
-		ip = str(request.META['REMOTE_ADDR'])
-	else:
-		ip = None
+	tracking_slug = uuid.UUID(tracking_slug)
+	tracking_slugs = [d.tracking_slug for d in Domain.objects.all()]
+	if tracking_slug in tracking_slugs:
+		domain = Domain.objects.get(tracking_slug=tracking_slug)
+		#https://freegeoip.io/
+		if 'HTTP_X_FORWARDED_FOR' in request.META.keys() and request.META['HTTP_X_FORWARDED_FOR'] is not None:
+			ip = str(request.META['HTTP_X_FORWARDED_FOR'])
+		elif 'REMOTE_ADDR' in request.META.keys():
+			ip = str(request.META['REMOTE_ADDR'])
+		else:
+			ip = None
 
-	if ip is not None:
-		r = requests.get("https://freegeoip.app/json/" + ip)
-		if r.status_code == 200:
-			geoip = json.loads(r.text)
-			ip = geoip['ip']
-			country_code = geoip['country_code']
-			country_name = geoip['country_name']
-			region_name = geoip['region_name']
+		if ip is not None:
+			r = requests.get("https://freegeoip.app/json/" + ip)
+			if r.status_code == 200:
+				geoip = json.loads(r.text)
+				ip = geoip['ip']
+				country_code = geoip['country_code']
+				country_name = geoip['country_name']
+				region_name = geoip['region_name']
+				#print("Time zone: " + geoip['time_zone'])
 
-			#print("Time zone: " + geoip['time_zone'])
+		if 'HTTP_USER_AGENT' in request.META.keys():
+			ua_string = request.META.get('HTTP_USER_AGENT')
 
-	if 'HTTP_USER_AGENT' in request.META.keys():
-		ua_string = request.META.get('HTTP_USER_AGENT')
-
-		os = user_agent_parser.ParseOS(ua_string)['family']
-		agent = user_agent_parser.ParseUserAgent(ua_string)['family']
-		device = user_agent_parser.ParseDevice(ua_string)['family']
-	
-	visit = PageVisit(ip=ip, agent=agent, os=os, device=device, country_name=country_name, country_code=country_code, region_name=region_name, time_opened=timezone.now())
-	visit.save()
-	return(HttpResponse('pixel'))
+			os = user_agent_parser.ParseOS(ua_string)['family']
+			agent = user_agent_parser.ParseUserAgent(ua_string)['family']
+			device = user_agent_parser.ParseDevice(ua_string)['family']
+		
+		visit = PageVisit(domain=domain, ip=ip, agent=agent, os=os, device=device, country_name=country_name, country_code=country_code, region_name=region_name, time_opened=timezone.now())
+		visit.save()
+		return(HttpResponse('pixel'))
 
 
 def settings(request):
 
 	if request.user.is_authenticated:
-		#POST
+		user = User.objects.get(id=request.session['_auth_user_id'])
+		domains = [(d.id, d.domain_name) for d in Domain.objects.filter(user=user)]
+		
 		if request.method == "POST":
-			register_domain_form = RegisterDomainForm(request.POST)
-			delete_domain_form = DeleteDomainForm(request.POST)
+			register_domain_form = RegisterDomainForm(data=request.POST)
+			delete_domain_form = SelectDomainForm(data=request.POST, domains=domains)
 			change_password_form = ChangePasswordForm(data=request.POST,user=request.user)
 
 			if register_domain_form.is_valid():
-				print("Register Domain.")
-				user = User.objects.get(id=request.session['_auth_user_id'])
 				domain_name = register_domain_form.cleaned_data.get("reg_domain_name")
 				domain = Domain(user=user,domain_name=domain_name)
 				domain.save()
 
 			elif delete_domain_form.is_valid():
-				print("Delete Domain")
 				domain_name = delete_domain_form.cleaned_data.get("del_domain_name")
 				Domain.objects.filter(domain_name=domain_name).delete()
 				
 			elif change_password_form.is_valid():
-				print("change pwd")
 				user = change_password_form.save()
 				update_session_auth_hash(request, user)  # Important!
 				return redirect("homepage")
@@ -94,7 +108,7 @@ def settings(request):
 
 
 			register_domain_form = RegisterDomainForm()
-			delete_domain_form = DeleteDomainForm()
+			delete_domain_form = SelectDomainForm(domains=domains)
 			change_password_form = ChangePasswordForm(user=request.user)
 
 			return render(request=request,
@@ -103,10 +117,9 @@ def settings(request):
 				"delete_domain_form":delete_domain_form,
 				"change_password_form":change_password_form})
 
-		#GET
 		else:
 			register_domain_form = RegisterDomainForm()
-			delete_domain_form = DeleteDomainForm()
+			delete_domain_form = SelectDomainForm(domains=domains)
 			change_password_form = ChangePasswordForm(user=request.user)
 
 			return render(request=request,

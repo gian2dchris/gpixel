@@ -3,15 +3,21 @@
 		<div class="container">
 			{% if user.is_authenticated %}
 			<h1>Greetings {{user.username}}</h1>
-			<div class="data">
-		        <select name=domain class="browser-default">
-				{% for d in domains %}
-		            <option>{{d.domain_name}}</option>
-				{% endfor %}
-		    	</select>
-			</div>
+
+			<form method="POST">
+ 			{% csrf_token %}
+			{{ select_domain_form.domain.label_tag }}
+ 			{{ select_domain_form.domain}}
+			<div class="input-field">
+				<select name="{{ select_domain_form.domain.name }}" class="browser-default" onchange='submit();'>
+            	{% for d in select_domain_form.fields.domain.choices %}
+              		<option value="{{d.0}}">{{d.1}}</option>
+        		{% endfor %}
+	      		</select>
+          	</div>
+			</form>
+
 			<br>
-			
 			<div class="data">
 			 	<table class="table table-striped table-bordered">
 					<tr>
