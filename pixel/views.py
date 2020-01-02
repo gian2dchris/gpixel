@@ -75,10 +75,14 @@ def pixel(request, tracking_slug):
 			device = user_agent_parser.ParseDevice(ua_string)['family']
 		
 		if 'HTTP_REFERER' in request.META.keys():
-			print(request.META['HTTP_REFERER'])
+			referer = request.META.get('HTTP_REFERER')
+		else:
+			referer = ""
 
-		visit = PageVisit(domain=domain, ip=ip, agent=agent, os=os, device=device, country_name=country_name, country_code=country_code, region_name=region_name, time_opened=timezone.now())
+
+		visit = PageVisit(domain=domain, ip=ip, agent=agent, os=os, device=device, country_name=country_name, country_code=country_code, region_name=region_name, time_opened=timezone.now(), referer=referer)
 		visit.save()
+		
 		return(HttpResponse('pixel'))
 
 
