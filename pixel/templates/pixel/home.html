@@ -28,14 +28,15 @@
 		<style>    
 		</style>
 			<tr class="green accent-4  grey-text text-darken-4">
-				<th class="grey-text text-darken-4">Time Opened</th>
-				<th class="grey-text text-darken-4">IP</th>
-				<th class="grey-text text-darken-4">Country</th>
-				<th class="grey-text text-darken-4">Country Code</th>
-				<th class="grey-text text-darken-4">Region</th>
-				<th class="grey-text text-darken-4">Device</th>
-				<th class="grey-text text-darken-4">OS</th>
-				<th class="grey-text text-darken-4">Agent</th>
+				<th class="centered grey-text text-darken-4">Time Opened</th>
+				<th class="centered grey-text text-darken-4">IP</th>
+				<th class="centered grey-text text-darken-4">Country</th>
+				<th class="centered grey-text text-darken-4">Country Code</th>
+				<th class="centered grey-text text-darken-4">Region</th>
+				<th class="centered grey-text text-darken-4">Device</th>
+				<th class="centered grey-text text-darken-4">OS</th>
+				<th class="centered grey-text text-darken-4">Agent</th>
+				<th class="centered grey-text text-darken-4">Url</th>
 			</tr>
 		{% for v in page_visits%}
 			<tr>
@@ -47,6 +48,7 @@
 				<td>{{ v.device }}</td>
 				<td>{{ v.agent }}</td>			
 				<td>{{ v.os }}</td>
+				<td>{{ v.url_path }}</td>
 			</tr>
 		{% endfor %}
 	</table>
