@@ -9,35 +9,27 @@
     <!-- CSS  -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="/static/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-    <link href="/static/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/><style>
-    table, th, td {
-     border: 2px solid black;
-     color: white;
+    <link href="/static/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
 
-    }
-    th {
-      background-color: limegreen;
-    }
-    </style>
-    <nav>
-      <div class="nav-wrapper" style="background-color: limegreen;">
-        <a href="/" class="brand-logo">PixelTracker</a>
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
-          <li><a href="/"> Home</a></li>
+    <nav class="green accent-4 white-text" role="navigation">
+    <div class="nav-wrapper">
+      <a id="logo-container" class="brand-logo grey-text text-darken-4" href="/" class="brand-logo"> PixelTracker </a>
+        <ul class="right hide-on-med-and-down">
+          <li><a class="grey-text text-darken-4" href="/"> Home</a></li>
           {% if user.is_authenticated %}
-            <li><a href="/settings">Settings</a></li>
-            <li><a href="/logout">Logout</a></li>
+            <li><a class="grey-text text-darken-4" href="/settings">Settings</a></li>
+            <li><a class="grey-text text-darken-4" href="/logout">Logout</a></li>
           {% else %}
-            <li><a href="/register">Register</a></li>
-            <li><a href="/login">Login</a></li>
+            <li><a class="grey-text text-darken-4" href="/register">Register</a></li>
+            <li><a class="grey-text text-darken-4" href="/login">Login</a></li>
           {% endif %}
         </ul>
-      </div>
+    </div>
     </nav>
 
   </head>
 
-  <body style="color: white; background-color: darkslategrey;">
+  <body class="blue-grey darken-4 white-text container">
     <div class="container">
       <br></br>
       {% block content %}

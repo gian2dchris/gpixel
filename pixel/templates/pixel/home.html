@@ -1,55 +1,58 @@
 {% extends "pixel/base.html" %}
 	{% block content%}	
-		<div class="container">
-			{% if user.is_authenticated %}
-			<h1>Greetings {{user.username}}</h1>
+	<div id="index-banner">
+		{% if user.is_authenticated %}
+		<h5>Greetings {{user.username}}</h5>
 
-			<form method="POST">
- 			{% csrf_token %}
-			{{ select_domain_form.domain.label_tag }}
- 			{{ select_domain_form.domain}}
-			<div class="input-field">
-				<select name="{{ select_domain_form.domain.name }}" class="browser-default" onchange='submit();'>
-            	{% for d in select_domain_form.fields.domain.choices %}
-              		<option value="{{d.0}}">{{d.1}}</option>
-        		{% endfor %}
-	      		</select>
-          	</div>
-			</form>
-
-			<br>
-			<textarea>
-			&ltimg src=http://localhost:8000/pixel/{{ slug }}&gt
-			</textarea>
-			<br>
-			<div class="data">
-			 	<table class="table table-striped table-bordered">
-					<tr>
-						<th>Time Opened</th>
-						<th>IP</th>
-						<th>Country</th>
-						<th>Country Code</th>
-						<th>Region</th>
-						<th>Device</th>
-						<th>OS</th>
-						<th>Agent</th>
-					</tr>
-				{% for v in page_visits%}
-					<tr>
-						<td>{{ v.time_opened }}</td>
-						<td>{{ v.ip }}</td>
-						<td>{{ v.country_name }}</td>
-						<td>{{ v.country_code }}</td>
-						<td>{{ v.region_name }}</td>
-						<td>{{ v.device }}</td>
-						<td>{{ v.agent }}</td>			
-						<td>{{ v.os }}</td>
-					</tr>
-				{% endfor %}
-				</table>
-			</div>
-		{% else %}
-			<h1>Greetings</h1>
-		{% endif %}
+		<form method="POST">
+		{% csrf_token %}
+		{{ select_domain_form.domain.label_tag }}
+		{{ select_domain_form.domain}}
+		<div class="input-field">
+			<select name="{{ select_domain_form.domain.name }}" class="browser-default">
+        	{% for d in select_domain_form.fields.domain.choices %}
+          		<option value="{{d.0}}">{{d.1}}</option>
+    		{% endfor %}
+      		</select>
+      	</div>
+		<button class="btn green accent-4 grey-text text-darken-4" type="submit"> Select </button>
+		</form>
+		<br>
+		Copy the following &ltimg&gt tag into your applications basecode: 
+		<div class="input-field center">
+		&ltimg src=http://localhost:8000/pixel/{{ slug }}&gt
+		</div>
+		<br>
+	 	<div class="row center">
+  	    <table class="highlight">
+		<style>    
+		</style>
+			<tr class="green accent-4  grey-text text-darken-4">
+				<th class="grey-text text-darken-4">Time Opened</th>
+				<th class="grey-text text-darken-4">IP</th>
+				<th class="grey-text text-darken-4">Country</th>
+				<th class="grey-text text-darken-4">Country Code</th>
+				<th class="grey-text text-darken-4">Region</th>
+				<th class="grey-text text-darken-4">Device</th>
+				<th class="grey-text text-darken-4">OS</th>
+				<th class="grey-text text-darken-4">Agent</th>
+			</tr>
+		{% for v in page_visits%}
+			<tr>
+				<td>{{ v.time_opened }}</td>
+				<td>{{ v.ip }}</td>
+				<td>{{ v.country_name }}</td>
+				<td>{{ v.country_code }}</td>
+				<td>{{ v.region_name }}</td>
+				<td>{{ v.device }}</td>
+				<td>{{ v.agent }}</td>			
+				<td>{{ v.os }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+	</div>
+	{% else %}
+	<h1>Greetings</h1>
+	{% endif %}
 	</div>
 	{% endblock%}
