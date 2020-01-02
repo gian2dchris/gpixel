@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseNotFound
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.utils import timezone
-from django.contrib import messages
 
 from .forms import NewUserForm,RegisterDomainForm,SelectDomainForm,ChangePasswordForm
 from .models import PageVisit, Domain
@@ -25,27 +24,33 @@ def homepage(request):
 		if request.method == "POST":
 			select_domain_form = SelectDomainForm(data=request.POST, domains=domains)
 			if select_domain_form.is_valid():
-				domain = select_domain_form.cleaned_data.get('domain')
-				page_visits = PageVisit.objects.filter(domain=domain).values().order_by("-time_opened")
+				domain_id = select_domain_form.cleaned_data.get('domain')
+				domain = Domain.objects.filter(id=domain_id)
+				page_visits = PageVisit.objects.filter(domain=domain[0]).values().order_by("-time_opened")
+				domain = domain.values()[0]
 				return render(request=request,
 					template_name="pixel/home.html",
-					context={"page_visits": page_visits, "domains":domains,"select_domain_form":select_domain_form})
-
+					context={"page_visits": page_visits, "domains":domains,"select_domain_form":select_domain_form, "slug":str(domain['tracking_slug'])})
 		else:
 			select_domain_form = SelectDomainForm(domains=domains)
 			page_visits = PageVisit.objects.filter(domain=domains[0]).values().order_by("-time_opened")
+			domain = Domain.objects.filter(id=domains[0][0]).values()[0]
 			return render(request=request,
 				template_name="pixel/home.html",
-				context={"page_visits": page_visits, "domains":domains,"select_domain_form":select_domain_form})
+				context={"page_visits": page_visits, "domains":domains,"select_domain_form":select_domain_form, "slug":str(domain['tracking_slug'])})
 	
 	else:
 		return render(request=request,
 				template_name="pixel/home.html",)
 
 	
-def pixel(request, tracking_slug):
+def pixel(request, tracking_slug=""):
 	
-	tracking_slug = uuid.UUID(tracking_slug)
+	try:
+		tracking_slug = uuid.UUID(tracking_slug)
+	except:
+		return HttpResponseNotFound('<h1>Error 404: Resource Not Found.</h1>')
+
 	tracking_slugs = [d.tracking_slug for d in Domain.objects.all()]
 	if tracking_slug in tracking_slugs:
 		domain = Domain.objects.get(tracking_slug=tracking_slug)
@@ -83,8 +88,11 @@ def pixel(request, tracking_slug):
 		visit = PageVisit(domain=domain, ip=ip, agent=agent, os=os, device=device, country_name=country_name, country_code=country_code, region_name=region_name, time_opened=timezone.now(), referer=referer)
 		visit.save()
 		
-		return(HttpResponse('pixel'))
-
+		pixel = '\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x01\x03\x00\x00\x00%\xdbV\xca\x00\x00\x00\x03PLTE\xffM\x00\\58\x7f\x00\x00\x00\x01tRNS\xcc\xd24V\xfd\x00\x00\x00\nIDATx\x9ccb\x00\x00\x00\x06\x00\x0367|\xa8\x00\x00\x00\x00IEND\xaeB`\x82'
+		return(HttpResponse(pixel))
+	
+	else:
+		return HttpResponseNotFound('<h1>Error 404: Resource Not Found.</h1>')
 
 def settings(request):
 
@@ -113,8 +121,7 @@ def settings(request):
 				update_session_auth_hash(request, user)  # Important!
 				return redirect("homepage")
 			else:
-				return HttpResponse("Not OK.")
-
+				return HttpResponse("Invalid Form Submission.")
 
 			register_domain_form = RegisterDomainForm()
 			delete_domain_form = SelectDomainForm(domains=domains)
@@ -149,13 +156,8 @@ def register(request):
 		if form.is_valid():
 			user = form.save()
 			username = form.cleaned_data.get('username')
-			messages.success(request, "New Account Created: {}.".format(username))
 			login(request, user)
-			messages.info(request, "You are now logged in as {}.".format(username))
 			return redirect("homepage")
-		else:
-			for msg in form.error_messages:
-				messages.error(request, "{}:{}".format(msg,form.error_messages[msg]))	
 	
 	form = NewUserForm()
 	return render(request,
@@ -175,13 +177,7 @@ def login_req(request):
 
 			if user is not None:
 				login(request,user)
-				messages.info(request, "You are now logged in as {}.".format(username))
 				return redirect("homepage")
-
-			else:
-				messages.error(request, "Invalid username or password.")
-		else:
-			messages.error(request, "Invalid username or password.")
 
 	form = AuthenticationForm()
 	return render(request,
@@ -193,8 +189,6 @@ def logout_req(request):
 	
 	if request.user.is_authenticated:
 		logout(request)
-		messages.info(request, "Logout Succesfully!")
 		return redirect("homepage")
 	else:
-		messages.info(request, "You are not Logged In!")
 		return redirect("homepage")

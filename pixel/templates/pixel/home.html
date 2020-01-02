@@ -1,7 +1,6 @@
 {% extends "pixel/base.html" %}
 	{% block content%}	
 		<div class="container">
-			<a>Referring Page: {{ request.META.HTTP_REFERER }}</a>
 			{% if user.is_authenticated %}
 			<h1>Greetings {{user.username}}</h1>
 
@@ -18,6 +17,10 @@
           	</div>
 			</form>
 
+			<br>
+			<textarea>
+			&ltimg src=http://localhost:8000/pixel/{{ slug }}&gt
+			</textarea>
 			<br>
 			<div class="data">
 			 	<table class="table table-striped table-bordered">
