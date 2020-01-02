@@ -7,7 +7,7 @@ RUN mkdir -p /var/www/app
 
 WORKDIR /var/www/gpixel
 
-ADD . /var/www/gpixel
+COPY . ./
 
 # Install dependencies
 RUN pip install -r requirements.txt
