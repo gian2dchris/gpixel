@@ -4,7 +4,7 @@
 		<form method="POST">
  			{% csrf_token %}
  			{{register_domain_form.as_p}}
- 			<button class="btn" type="submit"  style="background-color: limegreen";> Register </button>
+ 			<button class="btn green accent-4 grey-text text-darken-4" type="submit"> Register </button>
 		</form>
 
 		<form method="POST">
@@ -19,12 +19,12 @@
         		{% endfor %}
 	      		</select>
           	</div>
- 			<button class="btn" type="submit"  style="background-color: limegreen";> Delete </button>
+ 			<button class="btn green accent-4 grey-text text-darken-4" type="submit"> Delete </button>
 		</form>
 		<form method="POST">
  			{% csrf_token %}
  			{{change_password_form.as_p}}
- 			<button class="btn" type="submit"  style="background-color: limegreen";> Confirm </button>
+ 			<button class="btn green accent-4 grey-text text-darken-4" type="submit"> Confirm </button>
 		</form>
 
 		If you already have an account, <a href="/login"><strong>login</strongs></a> instead.
