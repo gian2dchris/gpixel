@@ -81,9 +81,10 @@ def pixel(request, tracking_slug=""):
 		
 		if 'HTTP_REFERER' in request.META.keys():
 			referer = request.META.get('HTTP_REFERER')
+			url = parse_url(referer).path
 		else:
 			referer = ""
-		url = parse_url(referer).path
+			url = ""
 
 		visit = PageVisit(domain=domain, ip=ip, agent=agent, os=os, device=device, country_name=country_name, country_code=country_code, region_name=region_name, time_opened=timezone.now(), url_path=url)
 		visit.save()
