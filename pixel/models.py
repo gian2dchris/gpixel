@@ -25,8 +25,8 @@ class PageVisit(models.Model):
 	country_code = models.CharField(max_length=200)
 	region_name = models.CharField(max_length=200)
 	time_opened = models.DateTimeField('time_opened')
-	domain = models.ForeignKey(Domain, on_delete=models.CASCADE)
 	url_path = models.CharField(max_length=200, default="")
+	domain = models.ForeignKey(Domain, on_delete=models.CASCADE)
 
 	def __str__(self):
 		return self.ip + self.time_opened
