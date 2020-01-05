@@ -18,7 +18,16 @@ Visit this URI to log out.
 
 **Main View: /**
 
-The main view of the application shows the domain data collected so far, along with the html snippet used for tracking the given domain. The user can toggle between the registered domains.
+The main view of the application shows the domain data collected so far, along with the html `<img>` tag used for tracking the given domain. The user can toggle between the registered domains. To start tracking a registered domain, the user has to include the tracking snippet in the domain's code base. The suggested place is in the `<header>`, as show below.
+
+```html
+<head>
+...
+    <!-- gpixel tracker -->
+    <img src="http://snf-871617.vm.okeanos.grnet.gr:4321/pixel/url-path" referrerpolicy="unsafe-url"  height="1" width="1" style="display:none">
+...
+</head>
+```
 
 **Settings: /settings**
 
