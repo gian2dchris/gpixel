@@ -3,12 +3,14 @@
 	<div id="index-banner">
 		{% if user.is_authenticated %}
 		<h5>Welcome {{user.username}}</h5>
+		{% if domains %}
 		<form method="POST">
 		{% csrf_token %}
 		{{ select_domain_form.domain.label_tag }}
 		{{ select_domain_form.domain}}
 		<div class="input-field">
 			<select name="{{ select_domain_form.domain.name }}" class="browser-default">
+    		<option value="-1">Select Domain.</option>	
         	{% for d in select_domain_form.fields.domain.choices %}
           		<option value="{{d.0}}">{{d.1}}</option>
     		{% endfor %}
@@ -17,10 +19,10 @@
 		<button class="btn green accent-4 grey-text text-darken-4" type="submit"> Select </button>
 		</form>
 		<br>
-		Copy the following &ltimg&gt tag into your applications basecode: 
-		<div class="input-field center">
-		&ltimg src={{request.scheme}}://{{request.META.HTTP_HOST}}/{{slug}} referrerpolicy="unsafe-url" height="1" width="1" style="display:none"&gt
-		</div>
+			Copy the following &ltimg&gt tag into your applications basecode: 
+			<div class="input-field center">
+			&ltimg src={{request.scheme}}://{{request.META.HTTP_HOST}}/{{slug}} referrerpolicy="unsafe-url" height="1" width="1" style="display:none"&gt
+			</div>
 		<br>
 	 	<div class="row center">
   	    <table class="highlight">
@@ -51,6 +53,9 @@
 			</tr>
 		{% endfor %}
 	</table>
+	{% else %}
+		<div>Go to <a href="/settings"><strong>settings</strongs></a>. to register a domain.</div>
+	{% endif %}
 	</div>
 	{% else %}
 	<h5>Welcome</h5>
