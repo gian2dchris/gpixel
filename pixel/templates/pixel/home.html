@@ -2,8 +2,7 @@
 	{% block content%}	
 	<div id="index-banner">
 		{% if user.is_authenticated %}
-		<h5>Greetings {{user.username}}</h5>
-
+		<h5>Welcome {{user.username}}</h5>
 		<form method="POST">
 		{% csrf_token %}
 		{{ select_domain_form.domain.label_tag }}
@@ -28,15 +27,15 @@
 		<style>    
 		</style>
 			<tr class="green accent-4  grey-text text-darken-4">
-				<th class="centered grey-text text-darken-4">Time Opened</th>
-				<th class="centered grey-text text-darken-4">IP</th>
-				<th class="centered grey-text text-darken-4">Country</th>
-				<th class="centered grey-text text-darken-4">Country Code</th>
-				<th class="centered grey-text text-darken-4">Region</th>
-				<th class="centered grey-text text-darken-4">Device</th>
-				<th class="centered grey-text text-darken-4">OS</th>
-				<th class="centered grey-text text-darken-4">Agent</th>
-				<th class="centered grey-text text-darken-4">Content</th>
+				<th class="grey-text text-darken-4">Time Opened</th>
+				<th class="grey-text text-darken-4">IP</th>
+				<th class="grey-text text-darken-4">Country</th>
+				<th class="grey-text text-darken-4">Country Code</th>
+				<th class="grey-text text-darken-4">Region</th>
+				<th class="grey-text text-darken-4">Device</th>
+				<th class="grey-text text-darken-4">OS</th>
+				<th class="grey-text text-darken-4">Agent</th>
+				<th class="grey-text text-darken-4">Content</th>
 			</tr>
 		{% for v in page_visits%}
 			<tr>
@@ -54,7 +53,7 @@
 	</table>
 	</div>
 	{% else %}
-	<h1>Greetings</h1>
+	<h5>Welcome</h5>
 	{% endif %}
 	</div>
 	{% endblock%}
