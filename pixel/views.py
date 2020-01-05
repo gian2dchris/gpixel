@@ -18,7 +18,7 @@ def homepage(request):
 
 	if request.user.is_authenticated:
 		user = User.objects.get(id=request.session['_auth_user_id'])
-		domains = [(d.id, d.domain_name) for d in Domain.objects.filter(user=user)]
+		domains = [(d.id, d.name) for d in Domain.objects.filter(user=user)]
 		domains = sorted(domains)
 
 		if request.method == "POST":
@@ -33,11 +33,15 @@ def homepage(request):
 					context={"page_visits": page_visits, "domains":domains,"select_domain_form":select_domain_form, "slug":str(domain['tracking_slug'])})
 		else:
 			select_domain_form = SelectDomainForm(domains=domains)
-			page_visits = PageVisit.objects.filter(domain=domains[0]).values().order_by("-time_opened")
-			domain = Domain.objects.filter(id=domains[0][0]).values()[0]
-			return render(request=request,
+			if domains:
+				page_visits = PageVisit.objects.filter(domain=domains[0]).values().order_by("-time_opened")
+				domain = Domain.objects.filter(id=domains[0][0]).values()[0]
+				return render(request=request,
 				template_name="pixel/home.html",
 				context={"page_visits": page_visits, "domains":domains,"select_domain_form":select_domain_form, "slug":str(domain['tracking_slug'])})
+			else:
+				return render(request=request,
+				template_name="pixel/home.html",)
 	
 	else:
 		return render(request=request,
@@ -89,8 +93,8 @@ def pixel(request, tracking_slug=""):
 		visit = PageVisit(domain=domain, ip=ip, agent=agent, os=os, device=device, country_name=country_name, country_code=country_code, region_name=region_name, time_opened=timezone.now(), url_path=url)
 		visit.save()
 		
-		pixel = '\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x01\x03\x00\x00\x00%\xdbV\xca\x00\x00\x00\x03PLTE\xffM\x00\\58\x7f\x00\x00\x00\x01tRNS\xcc\xd24V\xfd\x00\x00\x00\nIDATx\x9ccb\x00\x00\x00\x06\x00\x0367|\xa8\x00\x00\x00\x00IEND\xaeB`\x82'
-		return(HttpResponse(pixel))
+		pixel = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x01\x03\x00\x00\x00%\xdbV\xca\x00\x00\x00\x03PLTE\xffM\x00\\58\x7f\x00\x00\x00\x01tRNS\xcc\xd24V\xfd\x00\x00\x00\nIDATx\x9ccb\x00\x00\x00\x06\x00\x0367|\xa8\x00\x00\x00\x00IEND\xaeB`\x82"
+		return HttpResponse(pixel,content_type='image/png')
 	
 	else:
 		return HttpResponseNotFound('<h1>Error 404: Resource Not Found.</h1>')
@@ -99,7 +103,7 @@ def settings(request):
 
 	if request.user.is_authenticated:
 		user = User.objects.get(id=request.session['_auth_user_id'])
-		domains = [(d.id, d.domain_name) for d in Domain.objects.filter(user=user)]
+		domains = [(d.id, d.name) for d in Domain.objects.filter(user=user)]
 		
 		if request.method == "POST":
 			register_domain_form = RegisterDomainForm(data=request.POST)
@@ -108,18 +112,18 @@ def settings(request):
 
 			if register_domain_form.is_valid():
 				domain_name = register_domain_form.cleaned_data.get("domain_name")
-				domain_names = [d.domain_name for d in Domain.objects.filter(user=user)]
-				if domain_name not in domain_names:
-					domain = Domain(user=user,domain_name=domain_name)
+				d = Domain.objects.filter(name=domain_name)
+				if not d:
+					domain = Domain(user=user,name=domain_name)
 					domain.save()
-					domains = [(d.id, d.domain_name) for d in Domain.objects.filter(user=user)]
+					domains = [(d.id, d.name) for d in Domain.objects.filter(user=user)]
 				else:
 					return HttpResponse("Domain already registered")
-							
+
 			elif delete_domain_form.is_valid():
 				domain_id = delete_domain_form.cleaned_data.get("domain")
 				Domain.objects.filter(id=domain_id).delete()
-				domains = [(d.id, d.domain_name) for d in Domain.objects.filter(user=user)]
+				domains = [(d.id, d.name) for d in Domain.objects.filter(user=user)]
 		
 			elif change_password_form.is_valid():
 				user = change_password_form.save()

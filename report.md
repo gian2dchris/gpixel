@@ -149,3 +149,6 @@ $ curl -XGET https://freegeoip.app/json/8.8.8.8 | json_pp
 https://developers.facebook.com/docs/facebook-pixel/implementation/conversion-tracking
 
 https://developers.facebook.com/docs/facebook-pixel/implementation/pixel-for-official-events
+
+[django many-to-many relationship example](https://stackoverflow.com/questions/13390315/have-multiple-users-as-one-model-field-in-many-to-one-format-django-models)
+
