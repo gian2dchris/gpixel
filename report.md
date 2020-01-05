@@ -34,11 +34,11 @@ The settings tab provides the following functionality:
 
 ## Analytic Services and User Privacy 
 
-Modern site analytics services (Google Analytics, Facebook Pixel, etc.) collect more information, than people should be comfortable with. Practically integrating an analytics service to your website, means adding 3rd-party scripts, that track user information. This is done by setting tracking cookies for Internet wide tracking, gathering device, browser and geo  information or using more complex techniques, such as performing complex operations to identify hardware specifications.
+Modern site analytics services (Google Analytics, Facebook Pixel, etc.) collect more information, than people should be comfortable with. Practically embedding an analytics service to your website, means adding 3rd-party scripts, that track user information. This is done by setting tracking cookies for Internet wide tracking, gathering device, browser and geo  information or using more complex techniques, such as performing complex operations to identify hardware specifications.
 
-The above are way more than what a site maintainer needs for tracking and optimizing access to the provided content, and are used by the 3rd-party provider to build a profile for your sites visitors in order to track them Internet Wide, which rises concerns about what information are exposing and to who, with the use of such a services.
+The collected information are way more than what a site maintainer needs for tracking and optimizing access to the provided content, and are used by the 3rd-party provider to build a profile for sites visitors in order to track them across the web, which rises concerns about what information are exposing and to who, with the use of such a services.
 
-Last but not least, when choosing an analytics solution one must keep in mind that most anti tracking mechanisms, block most widely used trackers by default.
+Last but not least, when choosing an analytics solution one must keep in mind that most anti tracking mechanisms, block most widely used trackers by default. As an example the case of Google analytics is examined below.
 
 ## Google analytics Privacy Information
 

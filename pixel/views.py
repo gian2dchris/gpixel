@@ -108,10 +108,14 @@ def settings(request):
 
 			if register_domain_form.is_valid():
 				domain_name = register_domain_form.cleaned_data.get("domain_name")
-				domain = Domain(user=user,domain_name=domain_name)
-				domain.save()
-				domains = [(d.id, d.domain_name) for d in Domain.objects.filter(user=user)]
-		
+				domain_names = [d.domain_name for d in Domain.objects.filter(user=user)]
+				if domain_name not in domain_names:
+					domain = Domain(user=user,domain_name=domain_name)
+					domain.save()
+					domains = [(d.id, d.domain_name) for d in Domain.objects.filter(user=user)]
+				else:
+					return HttpResponse("Domain already registered")
+							
 			elif delete_domain_form.is_valid():
 				domain_id = delete_domain_form.cleaned_data.get("domain")
 				Domain.objects.filter(id=domain_id).delete()

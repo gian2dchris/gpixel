@@ -8,8 +8,8 @@ import uuid
 class Domain(models.Model):
 	
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="User", on_delete=models.CASCADE)
-	domain_name = models.CharField(max_length=200)
-	tracking_slug = models.UUIDField(default=uuid.uuid4, editable=False)
+	domain_name = models.CharField(max_length=200, unique=True)
+	tracking_slug = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
 	def __str__(self):
 		return self.domain_name
