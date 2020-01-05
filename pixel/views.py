@@ -122,7 +122,7 @@ def settings(request):
 
 			elif delete_domain_form.is_valid():
 				domain_id = delete_domain_form.cleaned_data.get("domain")
-				Domain.objects.filter(id=domain_id).delete()
+				Domain.objects.filter(user=user, id=domain_id).delete()
 				domains = [(d.id, d.name) for d in Domain.objects.filter(user=user)]
 		
 			elif change_password_form.is_valid():
