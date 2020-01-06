@@ -39,7 +39,7 @@ The settings tab provides the following functionality:
 
 ## ER Diagram
 
-![](/home/gian/Documents/django-site/gpixel/static/er_gpixel.png)
+![](./static/er_gpixel.png)
 
 ## Analytic Services and User Privacy 
 
