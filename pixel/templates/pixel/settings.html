@@ -10,7 +10,6 @@
 		<form method="POST">
  			{% csrf_token %}
 			{{ delete_domain_form.domain.label_tag }}
- 			{{ delete_domain_form.domain}}
 			<div class="input-field">
 				<select name="{{ delete_domain_form.domain.name }}" class="browser-default">
             	<option value="-1">Select a Domain to Delete.</option>

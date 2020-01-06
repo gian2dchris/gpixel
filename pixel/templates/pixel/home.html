@@ -7,7 +7,6 @@
 		<form method="POST">
 		{% csrf_token %}
 		{{ select_domain_form.domain.label_tag }}
-		{{ select_domain_form.domain}}
 		<div class="input-field">
 			<select name="{{ select_domain_form.domain.name }}" class="browser-default">
     		<option value="-1">Select Domain.</option>	
