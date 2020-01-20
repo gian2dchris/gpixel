@@ -1,16 +1,27 @@
-FROM python:3.8.1-alpine as builder
+# pull official base image
+FROM python:3.8.0-alpine
 
 # Initialize enviroment
-RUN apk update && apk add --no-cache git
+RUN apk update && apk add --no-cache git postgresql-dev gcc python3-dev musl-dev
 
-RUN mkdir -p /var/www/app
+WORKDIR /usr/src/gpixel
 
-WORKDIR /var/www/gpixel
+# set environment variables
+#prevents python from writing .pyc
+ENV PYTHONDONTWRITEBYTECODE 1
+#prevents buffering stdout/stderr
+ENV PYTHONUNBUFFERED 1
 
-COPY . ./
-
-# Install dependencies
+# install dependencies
+RUN pip install --upgrade pip
+COPY ./requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
-# Run App
-CMD [ "python", "manage.py runserver 0.0.0.0:8000" ]
+# copy entrypoint.sh
+COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
+
+# copy project
+COPY . /usr/src/gpixel
+
+# run entrypoint.sh
+ENTRYPOINT ["/usr/src/app/entrypoint.sh"]

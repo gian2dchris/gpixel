@@ -137,7 +137,6 @@ $ curl -XGET https://freegeoip.app/json/8.8.8.8 | json_pp
 - Export data in JSON for further analysis.
 - Data Visualization. (React JS)
 - Async Javascript and API. (XMLHttpRequest, AJAX)
-- Delay to trick crawlers.
 
 ## References
 
@@ -159,5 +158,9 @@ https://developers.facebook.com/docs/facebook-pixel/implementation/conversion-tr
 
 https://developers.facebook.com/docs/facebook-pixel/implementation/pixel-for-official-events
 
-[django many-to-many relationship example](https://stackoverflow.com/questions/13390315/have-multiple-users-as-one-model-field-in-many-to-one-format-django-models)
+Dockerize:
+
+https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/
+
+https://github.com/testdrivenio/django-on-docker
 

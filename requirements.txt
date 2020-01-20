@@ -1,2 +1,6 @@
 Django==2.2.8
+gunicorn==20.0.4
 ua-parser==0.8.0
+requests==2.22.0
+psycopg2==2.8.4
+
