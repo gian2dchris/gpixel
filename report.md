@@ -131,12 +131,12 @@ $ curl -XGET https://freegeoip.app/json/8.8.8.8 | json_pp
 ```
 
 ## TODO
-
-- HTTPS
+- Fix the UI, IT'S LAME!
 - Github Pages integration.
-- Export data in JSON for further analysis.
-- Data Visualization. (React JS)
-- Async Javascript and API. (XMLHttpRequest, AJAX)
+- Export data as json for further analysis.
+- Rest API.
+- Data Visualization.
+- HTTPS
 - Delay to trick crawlers.
 
 ## References
